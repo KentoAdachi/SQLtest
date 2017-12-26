@@ -9,9 +9,19 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Random;
 
+/**
+ * @author BP16001
+ *
+ */
 public class Test {
 
+	/**
+	 * コネクションの作成
+	 *
+	 * @return
+	 */
 	public static Connection getConnection() {
 		try {
 			// JDBCドライバのロード（JDK1.5以降では不要）
@@ -28,6 +38,13 @@ public class Test {
 		}
 	}
 
+	/**
+	 * SQL実行
+	 *
+	 * @param sql
+	 * @return
+	 * @throws SQLException
+	 */
 	public static ResultSet executeQuery(String sql) throws SQLException {
 		Connection con = getConnection();
 		// ステートメントオブジェクト（SQLコンテナ）の作成
@@ -42,21 +59,63 @@ public class Test {
 		return rs;
 	}
 
+	/**
+	 * メインメソッド
+	 *
+	 * @param args
+	 * @throws Exception
+	 */
 	public static void main(String[] args) throws Exception {
 
 		System.out.println("変更前");
-		showTable();
+//		showTable();
 
-		insertRecord(4, "u4", "i4", 1);
+//		insertRecord(4, "u4", "i4", 1);
+		generateRandomData(100);
+
+		for(int i = 1; i <= 10; i++) {
+			String itemID = "i"+i;
+			countItemID(itemID);
+		}
 
 		System.out.println("変更後");
-		showTable();
+//		showTable();
 
-		executeQuery("delete from 注文表 where 注文番号=4");
+//		executeQuery("delete from 注文表 where 注文番号=4");
 
 		System.out.println("終了前");
+//		deleteAllData();
 		showTable();
 
+	}
+
+	static void deleteAllData() throws SQLException {
+		executeQuery("delete from 注文表");
+	}
+
+	static void countItemID(String element) throws SQLException {
+		ResultSet rSet =  executeQuery("select count (*)from 注文表 where 商品ID='"+element+"'");
+		while(rSet.next()) {
+			System.out.println(element + " : "+rSet.getString(1));
+		}
+
+	}
+	static void generateRandomData(int amount) throws SQLException {
+
+		Connection connection = getConnection();
+		Statement statement = connection.createStatement();
+
+		for (int i = 1; i <= amount; i++) {
+			Random random = new Random();
+
+			double seed = random.nextInt(10)+1;
+			String itemID ="i" + (int)(seed);
+			System.out.println(itemID);
+			statement.executeQuery("insert into 注文表 values(" + i + ",'" + "u"+i + "','" + itemID + "'," + 1 + ")");
+			//			insertRecord(i, "u"+i,itemID, 1);
+
+
+		}
 	}
 
 	static void showTable() throws SQLException {
@@ -70,6 +129,7 @@ public class Test {
 	}
 
 	static void insertRecord(int orderNumber, String customID, String itemID, int quantity) throws SQLException {
+		System.out.println("inserting : "+orderNumber);
 		executeQuery(
 				"insert into 注文表 values(" + orderNumber + ",'" + customID + "','" + itemID + "'," + quantity + ")");
 	}
