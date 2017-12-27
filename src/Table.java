@@ -1,11 +1,12 @@
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * 汎用的なテーブルへのSQL操作をまとめたクラス
  *
- * @author BP16001 足立賢人 試験場
+ * @author BP16001 足立賢人
  */
 public class Table {
 
@@ -17,7 +18,7 @@ public class Table {
 	ArrayList<String> columns_;
 
 	/**
-	 * デフォルトコンストラクタ
+	 * コンストラクタ
 	 *
 	 * @param name
 	 *            テーブル名
@@ -33,8 +34,22 @@ public class Table {
 		columns_ = columns;
 	}
 
-	String getName() {
-		return name_;
+	/**
+	 * ArrayListをStringに結合する java8以降でのString.joinに相当する
+	 *
+	 * @param record
+	 * @return
+	 */
+	private static String join(ArrayList<Object> record) {
+		StringBuilder builder = new StringBuilder();
+		for (Object datum : record) {
+			if (builder.length() > 0) {
+				builder.append(",");
+			}
+			builder.append(datum);
+		}
+		return builder.toString();
+
 	}
 
 	/**
@@ -45,7 +60,7 @@ public class Table {
 	 * @return
 	 * @throws SQLException
 	 */
-	private ResultSet executeQuery(String sql) throws SQLException {
+	public ResultSet executeQuery(String sql) throws SQLException {
 		return manager_.executeQuery(sql);
 	}
 
@@ -55,49 +70,93 @@ public class Table {
 	 * @return 実行結果
 	 * @throws SQLException
 	 */
-	public ResultSet deleteAllRecord() throws SQLException {
-		return executeQuery("delete from " + name_);
+	ResultSet deleteAllRecord() throws SQLException {
+		return executeQuery("truncate table " + name_);
 	}
 
 	/**
-	 * テーブルにレコードを追加する
+	 * テーブルに新たなレコードを追加する
 	 *
-	 * @param data
+	 * @param record
 	 *            レコード内容
 	 * @return 実行結果
 	 * @throws SQLException
 	 */
-	public ResultSet insertRecord(ArrayList<String> data) throws SQLException {
-
-		//		java7以前で書きたいなら
-		StringBuilder builder = new StringBuilder();
-		for (String datum : data) {
-			if (builder.length() > 0) {
-				builder.append(",");
-			}
-			builder.append(datum);
-		}
-		return executeQuery("insert into " + name_ + "values(" + builder.toString() + "");
-
+	public ResultSet insertRecord(ArrayList<Object> record) throws SQLException {
+		return executeQuery("insert into " + name_ + " values(" + join(record) + ")");
 		//		java8以降
 		//		return executeQuery("insert into "+name_+"values("+String.join(",", data)+")");
 	}
 
 	/**
-	 * 全てのレコードを表示する
+	 * テーブルに新たなレコードを追加する 挿入するラベル名を指定する
+	 *
+	 * @param columns
+	 *            カラム名
+	 * @param record
+	 *            レコード内容
+	 * @return
+	 * @throws SQLException
+	 */
+	public ResultSet insertRecord(ArrayList<String> columns, ArrayList<Object> record) throws SQLException {
+		return executeQuery("insert into " + name_ + " (" + join(new ArrayList<Object>(columns)) + ")" + " values("
+				+ join(record) + ")");
+	}
+
+	/**
+	 * 全てのレコードを取得する
+	 *
+	 * @return
+	 * @throws SQLException
+	 */
+	public ResultSet getAllRecord() throws SQLException {
+		return executeQuery("select * from " + name_);
+	}
+
+	/**
+	 * 全てのレコードを表示する getAllRecordの表示付き版
 	 *
 	 * @return
 	 * @throws SQLException
 	 */
 	public ResultSet showAllRecord() throws SQLException {
-		ResultSet resultSet = executeQuery("select * from " + name_);
+		ResultSet resultSet = getAllRecord();
 		while (resultSet.next()) {
-			for (String column : columns_) {
-				System.out.print(column + ": " + resultSet.getString(column) + ", ");
+			for (Iterator<String> iterator = columns_.iterator(); iterator.hasNext();) {
+				String column = iterator.next();
+
+				System.out.printf("%4s : %4s", column, resultSet.getString(column));
+				if (iterator.hasNext()) {
+					System.out.print(", ");
+				}
 			}
 			System.out.println("");
 		}
 		return resultSet;
 	}
+
+	/**
+	 * 指定列内の最大値を返す
+	 *
+	 * @param column
+	 * @return
+	 * @throws SQLException
+	 */
+	public int getMax(String column) throws SQLException {
+		ResultSet resultSet = executeQuery("select max ( " + column + " ) from " + name_);
+		resultSet.next();
+		return resultSet.getInt(1);
+	}
+
+	/**
+	 * シングルクォーテーションで囲む
+	 * @param string
+	 * @return
+	 */
+	protected static String addQuot(String string) {
+		return "'"+string+"'";
+
+	}
+
 
 }

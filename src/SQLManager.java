@@ -36,6 +36,7 @@ public class SQLManager {
 		// DB接続オブジェクトの作成
 		//（引数は、データベースのURLとシステム名、ユーザ名、パスワード)
 		// HSQLDBの場合、ユーザ名：sa、パスワード：なしのデフォルト設定がある
+		// DBのクラスパスはlib内のhsqldb.jar
 		return DriverManager.getConnection("jdbc:hsqldb:hsql://localhost", "sa", "");
 	}
 
