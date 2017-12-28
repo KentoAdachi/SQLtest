@@ -1,4 +1,5 @@
-﻿// Test1.java
+﻿package test;
+// Test1.java
 // Javaアプリケーションから、HSQLDB上のテーブルuserinfoに
 // アクセスする
 
@@ -12,6 +13,8 @@ import java.sql.Statement;
 import java.util.Random;
 
 /**
+ * 先生の作ったサンプル
+ * 使わない
  * @author BP16001
  *
  */

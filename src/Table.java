@@ -10,10 +10,8 @@ import java.util.Iterator;
  */
 public class Table {
 
-	//////////////
-	//フィールド//
-	//////////////
-	SQLManager manager_;
+
+	static SQLManager manager_;
 	String name_;
 	ArrayList<String> columns_;
 
@@ -60,7 +58,7 @@ public class Table {
 	 * @return
 	 * @throws SQLException
 	 */
-	public ResultSet executeQuery(String sql) throws SQLException {
+	public static ResultSet executeQuery(String sql) throws SQLException {
 		return manager_.executeQuery(sql);
 	}
 
@@ -70,7 +68,7 @@ public class Table {
 	 * @return 実行結果
 	 * @throws SQLException
 	 */
-	ResultSet deleteAllRecord() throws SQLException {
+	public ResultSet deleteAllRecord() throws SQLException {
 		return executeQuery("truncate table " + name_);
 	}
 
@@ -149,7 +147,7 @@ public class Table {
 	}
 
 	/**
-	 * シングルクォーテーションで囲む
+	 * 文字列をシングルクォーテーションで囲む
 	 * @param string
 	 * @return
 	 */
@@ -158,5 +156,12 @@ public class Table {
 
 	}
 
+	protected ResultSet selectColumn(String column,String key,int value) throws SQLException {
+		return executeQuery("select "+column+" from "+name_+" where "+key+"="+value);
+	}
+	protected ResultSet selectColumn(String column,int keyvalue) throws SQLException {
+		return selectColumn(column, columns_.get(0), keyvalue);
+
+	}
 
 }

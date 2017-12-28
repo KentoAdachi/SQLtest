@@ -3,7 +3,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
- * 注文表
+ * 注文表への操作をまとめたクラス
  *
  * @author BP16001
  *
@@ -39,27 +39,13 @@ public class OrderTable extends Table {
 	public boolean register(int customerID, int itemID, int quantity) {
 
 		try {
-		//在庫数の確認
-		if (!checkStock(itemID, quantity)) {
-			return false;
-		}
-
-		//料金の表示
-		System.out.println("料金は "+getPrice(itemID) * quantity+" 円");
-
-		ArrayList<Object> record = new ArrayList<>();
-		record.add(getUniqueOrderNumber());
-		record.add(customerID);
-		record.add(itemID);
-		record.add(quantity);
-		insertRecord(record);
-		//ここから
-
-		//商品表の在庫の更新
-		int stock = getStock(itemID);
-		executeQuery("update 商品表 set 在庫数="+(stock-1)+" where 商品ID="+itemID);
-
-		}catch (Exception e) {
+			ArrayList<Object> record = new ArrayList<>();
+			record.add(getUniqueOrderNumber());
+			record.add(customerID);
+			record.add(itemID);
+			record.add(quantity);
+			insertRecord(record);
+		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
 		}
@@ -70,27 +56,45 @@ public class OrderTable extends Table {
 		return getMax("注文番号") + 1;
 	}
 
-	private boolean checkStock(int itemID, int quantity) throws SQLException {
-		//在庫が存在するか
-		int stock = getStock(itemID);
-		if (stock - quantity <0) {
-			System.out.println("商品が存在しないか在庫が不足しています");
-			return false;
-		}
-
-		return true;
-	}
-
-	private int getStock(int itemID) throws SQLException {
-		ResultSet resultSet = executeQuery("select 在庫数 from 商品表 where 商品ID="+itemID);
+	/**
+	 * 注文蛮行から顧客IDを取得する
+	 * @param orderNumber
+	 * @return
+	 * @throws SQLException
+	 */
+	public int getCustomerID(int orderNumber) throws SQLException {
+		//			ResultSet resultSet = executeQuery("select 顧客ID from 注文表 where 注文番号=" + orderNumber);
+		ResultSet resultSet = selectColumn(columns_.get(1), orderNumber);
 		if (!resultSet.next()) {
 			return -1;
 		}
 		return resultSet.getInt(1);
 	}
 
-	private int getPrice(int itemID) throws SQLException {
-		ResultSet resultSet = executeQuery("select 値段 from 商品表 where 商品ID=" + itemID);
+	/**
+	 * 注文蛮行から商品IDを取得する
+	 * @param orderNumber
+	 * @return
+	 * @throws SQLException
+	 */
+	public int getItemID(int orderNumber) throws SQLException {
+		//		ResultSet resultSet = executeQuery("select 商品ID from 注文表 where 注文番号=" + orderNumber);
+		ResultSet resultSet = selectColumn(columns_.get(2), orderNumber);
+		if (!resultSet.next()) {
+			return -1;
+		}
+		return resultSet.getInt(1);
+	}
+
+	/**
+	 * 注文蛮行から購入数量を取得する
+	 * @param orderNumber
+	 * @return
+	 * @throws SQLException
+	 */
+	public int getQuantity(int orderNumber) throws SQLException {
+		//		ResultSet resultSet = executeQuery("select 購入数量 from 注文表 where 注文番号=" + orderNumber);
+		ResultSet resultSet = selectColumn(columns_.get(3), orderNumber);
 		if (!resultSet.next()) {
 			return -1;
 		}

@@ -1,3 +1,4 @@
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -53,7 +54,39 @@ public class CustomerTable extends Table {
 	}
 
 	private int getUniqueCustomerID() throws SQLException {
-		return getMax("顧客ID") + 1;
+		return getMax(columns_.get(0)) + 1;
+	}
+
+	/**
+	 * 顧客IDから氏名を取得
+	 * @param customerID
+	 * @return
+	 * @throws SQLException
+	 */
+	public String getUserName(int customerID) throws SQLException {
+		//		ResultSet resultSet = executeQuery("select 氏名 from 顧客 where 顧客ID=" + userID);
+		ResultSet resultSet = selectColumn(columns_.get(1), customerID);
+		if (!resultSet.next()) {
+			return null;
+		}
+		return resultSet.getString(1);
+
+	}
+
+	/**
+	 * 顧客IDからパスワードを取得
+	 * @param customerID
+	 * @return
+	 * @throws SQLException
+	 */
+	public String getPassword(int customerID) throws SQLException {
+		//		ResultSet resultSet = executeQuery("select パスワード from 顧客 where 顧客ID=" + userID);
+		ResultSet resultSet = selectColumn(columns_.get(2), customerID);
+		if (!resultSet.next()) {
+			return null;
+		}
+		return resultSet.getString(1);
+
 	}
 
 }
