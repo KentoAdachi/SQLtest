@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.SQLException;
+import java.util.Random;
 
 /**
  * 注文機能デモ用のクライアント
@@ -10,6 +11,8 @@ import java.sql.SQLException;
  */
 public class StateMahine {
 
+	private static final int ITEM_DEFAULT = 20;
+	private static final int CUSTOMER_DEFAULT = 100;
 	private static CustomerTable customerTable_;
 	private static ItemTable itemTable_;
 	private static OrderTable orderTable_;
@@ -44,7 +47,7 @@ public class StateMahine {
 		return reader_.readLine();
 	}
 	private static void rootState() throws IOException, NumberFormatException, SQLException {
-		System.out.println("こんにちは\n login\n register\n status");
+		System.out.println("\nこんにちは\n login\n register\n [status]\n [setup]");
 		String option = readLine();
 		switch (option) {
 		case "login":
@@ -55,6 +58,11 @@ public class StateMahine {
 			break;
 		case "status":
 			statusState();
+			rootState();
+			break;
+		case "setup":
+			setupState();
+			rootState();
 			break;
 		default:
 			System.out.println("exit");
@@ -62,6 +70,46 @@ public class StateMahine {
 		}
 
 	}
+	private static void setupState() throws SQLException {
+		itemTable_.deleteAllRecord();
+		customerTable_.deleteAllRecord();
+		orderTable_.deleteAllRecord();
+		registerAll(CUSTOMER_DEFAULT, customerTable_);
+		registerAll(ITEM_DEFAULT, itemTable_);
+		orderAll(CUSTOMER_DEFAULT,20, orderManager_);
+		System.out.println("SETUP_COMPLETED");
+	}
+	private static void registerAll(int n,CustomerTable customerTable) {
+		for(int i = 1; i <= n; i ++) {
+			String userName = "user"+i;
+			String password = "aaa";
+			customerTable.register(userName, password);
+		}
+	}
+	private static void registerAll(int n,ItemTable itemTable) {
+		for(int i = 1; i <= n;i++) {
+			String itemName = "item" + i;
+			int price = 100;
+			int stock = 100;
+			itemTable.register(itemName, price, stock);
+		}
+	}
+	private static void orderAll(int customer,int item,OrderManager orderManager) throws SQLException {
+
+		Random random = new Random();
+		for(int i = 1; i <= customer;i++) {
+			int customerID = i;
+			int n = random.nextInt(9);
+			for(int j = 1;j <= 1+n;j++) {
+				int itemID = random.nextInt(item)+1;
+				int quantity = 1;
+				orderManager.order(customerID, itemID, quantity);
+			}
+
+		}
+
+	}
+
 	private static void statusState() throws SQLException{
 		System.out.println("\n顧客表");
 		customerTable_.showAllRecord();
