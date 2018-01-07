@@ -14,7 +14,7 @@ public class SQLManager {
 	//////////////
 	//フィールド//
 	//////////////
-	private Statement currentStatement_;
+	private static Statement currentStatement_;
 
 	/**
 	 * デフォルトコンストラクタ
@@ -47,7 +47,7 @@ public class SQLManager {
 	 * @return 実行結果
 	 * @throws SQLException
 	 */
-	public ResultSet executeQuery(String sql) throws SQLException {
+	public static  ResultSet executeQuery(String sql) throws SQLException {
 		return currentStatement_.executeQuery(sql);
 	}
 

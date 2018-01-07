@@ -10,15 +10,18 @@ public class OrderManager {
 
 	OrderTable orderTable_;
 	ItemTable itemTable_;
+	CustomerTable customerTable_;
 
 	/**
 	 * コンストラクタ
 	 * @param orderTable
 	 * @param itemTable
+	 * @param customerTable
 	 */
-	public OrderManager(OrderTable orderTable, ItemTable itemTable) {
+	public OrderManager(OrderTable orderTable, ItemTable itemTable,CustomerTable customerTable) {
 		orderTable_ = orderTable;
 		itemTable_ = itemTable;
+		customerTable_ = customerTable;
 	}
 
 	/**
@@ -37,8 +40,8 @@ public class OrderManager {
 		if (!checkStock(itemID, quantity)) {
 			return false;
 		}
-		//price
-		System.out.println("確認 : 料金は " + itemTable_.getPrice(itemID) * quantity + " 円");
+		//料金の確認
+		System.out.println("料金は " + itemTable_.getPrice(itemID) * quantity + " 円");
 
 		ArrayList<Object> record = new ArrayList<>();
 		record.add(customerID);
@@ -69,5 +72,23 @@ public class OrderManager {
 		}
 
 		return true;
+	}
+
+	/**
+	 * ログイン処理 passwordとcustomerIDに紐づけられたpasswordが一致した場合true
+	 *
+	 * @param customerID
+	 * @param password
+	 * @return
+	 * @throws SQLException
+	 */
+	public  boolean login(int customerID, String password) throws SQLException {
+		System.out.println(customerTable_.getPassword(customerID));
+		if (customerTable_.getPassword(customerID).equals(password)) {
+			System.out.println("logined!");
+			return true;
+		}
+		System.out.println("password not correct");
+		return false;
 	}
 }

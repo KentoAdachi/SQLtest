@@ -1,29 +1,37 @@
 import java.sql.SQLException;
+import java.util.Random;
 
 /**
- * 機能テスト用 最終的にはユーザーインターフェース用のクラスを別に作る
+ * 管理用
+ * というか最初にデータベースを構築する用
  *
  * @author BP16001
  *
  */
 public class Main {
 
+	static final int CUSTOMER = 100;
+	static final int ITEM = 20;
+
 	/**
+	 * メインメソッド
 	 * @param args
 	 * @throws SQLException
 	 */
 	public static void main(String[] args) throws SQLException {
 
+		//変数の初期化
 		ItemTable itemTable = new ItemTable();
 		CustomerTable customerTable = new CustomerTable();
 		OrderTable orderTable = new OrderTable();
+		OrderManager orderManager = new OrderManager(orderTable, itemTable, customerTable);
 
-		OrderManager manager = new OrderManager(orderTable, itemTable);
+		RecomendManager recomendManager = new RecomendManager(customerTable, itemTable, orderTable);
 
-		customerTable.register("user1", "aaa");
-		itemTable.register("item1", 100, 10);
-		customerTable.register("user2", "bbb");
-		itemTable.register("item2", 200, 5);
+		//商品と顧客の登録
+		registerAll(CUSTOMER, customerTable);
+		registerAll(ITEM, itemTable);
+
 
 		System.out.println("\n変更前");
 		itemTable.showAllRecord();
@@ -31,8 +39,11 @@ public class Main {
 		orderTable.showAllRecord();
 		System.out.println("");
 
-		manager.order(1, 1, 1);
-		manager.order(2, 2, 2);
+		//注文
+
+
+		orderAll(CUSTOMER,ITEM, orderManager);
+
 
 		System.out.println("\n変更後");
 		itemTable.showAllRecord();
@@ -40,15 +51,51 @@ public class Main {
 		orderTable.showAllRecord();
 		System.out.println("");
 
-		itemTable.deleteAllRecord();
-		customerTable.deleteAllRecord();
-		orderTable.deleteAllRecord();
+//		recomendManager.recomend(1);
+
+//		//テーブルの消去
+//		itemTable.deleteAllRecord();
+//		customerTable.deleteAllRecord();
+//		orderTable.deleteAllRecord();
 
 		System.out.println("\n消去後");
 		itemTable.showAllRecord();
 		customerTable.showAllRecord();
 		orderTable.showAllRecord();
 		System.out.println("");
+	}
+
+	private static void registerAll(int n,CustomerTable customerTable) {
+		for(int i = 1; i <= n; i ++) {
+			String userName = "user"+i;
+			String password = "aaa";
+			customerTable.register(userName, password);
+		}
+	}
+
+	private static void registerAll(int n,ItemTable itemTable) {
+		for(int i = 1; i <= n;i++) {
+			String itemName = "item" + i;
+			int price = 100;
+			int stock = 100;
+			itemTable.register(itemName, price, stock);
+		}
+	}
+
+	private static void orderAll(int customer,int item,OrderManager orderManager) throws SQLException {
+
+		Random random = new Random();
+		for(int i = 1; i <= customer;i++) {
+			int customerID = i;
+			int n = random.nextInt(9);
+			for(int j = 1;j <= 1+n;j++) {
+				int itemID = random.nextInt(item)+1;
+				int quantity = 1;
+				orderManager.order(customerID, itemID, quantity);
+			}
+
+		}
+
 	}
 
 }

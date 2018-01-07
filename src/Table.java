@@ -58,8 +58,8 @@ public class Table {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static ResultSet executeQuery(String sql) throws SQLException {
-		return manager_.executeQuery(sql);
+	protected static ResultSet executeQuery(String sql) throws SQLException {
+		return SQLManager.executeQuery(sql);
 	}
 
 	/**
@@ -70,6 +70,17 @@ public class Table {
 	 */
 	public ResultSet deleteAllRecord() throws SQLException {
 		return executeQuery("truncate table " + name_);
+	}
+
+	/**
+	 * テーブルのレコード数を返す
+	 * @return
+	 * @throws SQLException
+	 */
+	public int count() throws SQLException {
+		ResultSet resultSet =  executeQuery("select count(*) from "+name_);
+		resultSet.next();
+		return resultSet.getInt(1);
 	}
 
 	/**

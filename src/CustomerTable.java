@@ -10,6 +10,7 @@ import java.util.ArrayList;
  */
 public class CustomerTable extends Table {
 
+
 	/**
 	 * コンストラクタ
 	 *
@@ -35,22 +36,24 @@ public class CustomerTable extends Table {
 	 * @return 登録が成功したかどうか
 	 * @throws SQLException
 	 */
-	public boolean register(String userName, String password) {
+	public int register(String userName, String password) {
 
 		userName = addQuot(userName);
 		password = addQuot(password);
 
 		ArrayList<Object> record = new ArrayList<>();
+		int customerID;
 		try {
-			record.add(getUniqueCustomerID());
+			customerID = getUniqueCustomerID();
+			record.add(customerID);
 			record.add(userName);
 			record.add(password);
 			insertRecord(record);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return false;
+			return 0;
 		}
-		return true;
+		return customerID;
 	}
 
 	private int getUniqueCustomerID() throws SQLException {
@@ -85,6 +88,7 @@ public class CustomerTable extends Table {
 		if (!resultSet.next()) {
 			return null;
 		}
+
 		return resultSet.getString(1);
 
 	}
