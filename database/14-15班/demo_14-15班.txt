@@ -1,0 +1,27 @@
+//テーブルの定義(打ち間違え勘違い等ある場合はjavaソースを優先)
+14-15班
+
+create table 顧客表 (
+顧客ID integer,
+氏名 varchar(20),
+パスワード varchar(20)
+)
+
+create table 商品表(
+商品ID integer,
+商品名 varchar(20),
+在庫数 integer,
+)
+
+create table 注文表(
+注文番号 integer,
+顧客ID integer,
+商品ID integer
+)
+
+//select関連 詳しくはjavaソースを参照
+//ほとんどのSQL文はTableクラスに書いてあります
+
+SELECT フィールド名 
+FROM テーブル名 
+WHERE 条件式

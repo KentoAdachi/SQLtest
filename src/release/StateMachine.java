@@ -1,3 +1,4 @@
+package release;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -9,7 +10,7 @@ import java.util.Random;
  * @author BP16001
  *
  */
-public class StateMahine {
+public class StateMachine {
 
 	private static final int ITEM_DEFAULT = 20;
 	private static final int CUSTOMER_DEFAULT = 100;
